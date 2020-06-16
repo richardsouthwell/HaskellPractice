@@ -124,3 +124,4 @@ myEqualizer (m,x) f g = ((Data.Map.fromList myList, x), Data.Map.fromList (Prelu
 
 myExex = myEqualizer (Data.Map.fromList [(1,1), (2,3), (3,2)], 1) (Data.Map.fromList [(1,1), (2,2),(3,3)]) (Data.Map.fromList [(1,1), (2,3), (3,2)])
 
+--
