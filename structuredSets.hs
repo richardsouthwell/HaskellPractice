@@ -117,7 +117,10 @@ myCoproduct (m, x) (n, y) = (Data.Map.union (massageRight (m, x) y False) (massa
 
 -- --------------
 
-myEqualizer :: Ord a => Ord b => Obj a -> (a -> b) -> (a -> b) -> (Obj a, Map a a)
-myEqualizer (m,x) f g = ((Data.Map.fromList myList, x), Data.Map.fromList (Prelude.map (\v -> (fst v, fst v)) myList)) where myList = [a | a <- (Data.Map.toList m), f (fst a) == g (fst a)]
+myEqualizer :: Ord a => Ord b => Obj a -> (Map a b) -> (Map a b) -> (Obj a, Map a a)
+myEqualizer (m,x) f g = ((Data.Map.fromList myList, x), Data.Map.fromList (Prelude.map (\v -> (fst v, fst v)) myList)) where myList = [a | a <- (Data.Map.toList m), (f ! ) (fst a) == (g ! ) (fst a)]
 
 -- hello internet
+
+myExex = myEqualizer (Data.Map.fromList [(1,1), (2,3), (3,2)], 1) (Data.Map.fromList [(1,1), (2,2),(3,3)]) (Data.Map.fromList [(1,1), (2,3), (3,2)])
+
