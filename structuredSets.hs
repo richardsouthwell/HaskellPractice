@@ -5,6 +5,7 @@ type DS a = (a -> a)
 -- we coul use this approach if we could use finite types, and check equality of functions
 --isArrow :: (a -> b) ->  (a -> a) -> (b -> b) -> Bool
 --isArrow f u1 u2 = ((f . u1) == (u2. f))
+--
 
 prodDS :: (a -> a) -> (b -> b) -> (a,b) -> (a,b)
 prodDS u1 u2 (x1, x2) = (u1 x1, u2 x2)
