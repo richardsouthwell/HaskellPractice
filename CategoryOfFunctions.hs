@@ -167,6 +167,9 @@ transposeV :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1
 -- given arrow (fL, fV) from c * a to b, transposeV sends a vertex c0 of c, to the vertex map fV(c0,_) which sends vertex a0 of a to fV(c0,a0)  
 transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c0 = Data.Map.fromList (Prelude.map (\v -> (v,(fV !) (c0, v))) (Data.Set.toList sa0)) 
 
+getTranspose :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> (Map c1 (Map a1 b1, Map a0 b0),Map c0 (Map a0 b0))
+getTranspose (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) = (Data.Map.fromList (Prelude.map (\v -> (v, transposeL (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) v)) (Data.Set.toList sc1)), Data.Map.fromList (Prelude.map (\v -> (v, transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) v)) (Data.Set.toList sc0)))
+
 -- make code to change a function specification to a map and apply it to write eval and transpose as maps
 
 --functionsToMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> (a1 -> b1) -> (a0 -> b0) -> (Map a1 b1, Map a0 b0)
