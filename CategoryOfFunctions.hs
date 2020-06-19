@@ -26,6 +26,15 @@ functionsToMaps (sa1, ma, sa0) fL fV = (Data.Map.fromList (Prelude.map (\v -> (v
 myProduct :: Ord a => Ord b => Ord c => Ord d => Obj a b -> Obj c d -> Obj (a,c) (b,d)
 myProduct (a,f,b) (c,g,d) = (aTimesc, Data.Map.fromList (Prelude.map (\v -> (v, ((f !) (fst v),(g !) (snd v)))) (Data.Set.toList aTimesc)), Data.Set.cartesianProduct b d) where aTimesc = Data.Set.cartesianProduct a c
 
+getP1 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj (a1,b1) (a0,b0) -> (Map (a1,b1) a1, Map (a0,b0) a0)
+getP1 (ds1, dm, ds0) = (Data.Map.fromList (Prelude.map (\v -> (v, fst v)) (Data.Set.toList ds1)), Data.Map.fromList (Prelude.map (\v -> (v, fst v)) (Data.Set.toList ds0)))
+
+-- run getP1 on (myProduct (a,f,b) (c,g,d)) to get first projection 
+
+getP2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj (a1,b1) (a0,b0) -> (Map (a1,b1) b1, Map (a0,b0) b0)
+getP2 (ds1, dm, ds0) = (Data.Map.fromList (Prelude.map (\v -> (v, snd v)) (Data.Set.toList ds1)), Data.Map.fromList (Prelude.map (\v -> (v, snd v)) (Data.Set.toList ds0)))
+
+
 -- p1L == p1V == fst 
 -- p2L == p2V == snd
 
@@ -240,3 +249,11 @@ myVertices2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Set.toList (t3 dataa) where dat
 --myVertices2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a0 b0, a0)]
 --myVertices2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Set.toList (t1 dataa) where dataa = myObj2 (sa1, ma, sa0) (sb1, mb, sb0)
 
+
+-----------------------------------
+
+-- composition of Maps
+-- terminal object
+-- Subobject classifier
+-- chi, and "subobject classified by arrow"
+-- identity arrows
