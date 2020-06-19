@@ -93,3 +93,11 @@ loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) loopMap = Prelude.map (\v -> (loop
 allArrows :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a1 b1, Map a0 b0)]
 allArrows (sa1, ma, sa0) (sb1, mb, sb0) = concat (Prelude.map (\v -> loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) v) (Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa1) (Data.Set.toList sb1))))
 
+allVertexMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [Map a0 b0]
+allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0) = Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa0) (Data.Set.toList sb0))
+
+-- presumably map and set automatically order
+
+exponentialObject :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Obj (Map a1 b1, Map a0 b0) (Map a0 b0)
+exponentialObject (sa1, ma, sa0) (sb1, mb, sb0) = (Data.Set.fromList arl, Data.Map.fromList (Prelude.map (\v -> (v,snd v)) arl), Data.Set.fromList (allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0))) where arl = allArrows (sa1, ma, sa0) (sb1, mb, sb0)
+
