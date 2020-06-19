@@ -65,10 +65,31 @@ myTest = setOfFnsIt myStart [2] ["x", "y"]
 setOfFns :: [a] -> [b] -> [[(a,b)]]
 setOfFns as bs = setOfFnsIt [[]] as bs
 
+-- test the above vs `tuples' code + fold based code
+
+
 -- setOfFns [1,2] ["x","y"]
 
+independentVertices :: Ord b1 => Ord b0 => Obj b1 b0 -> [b0]
+independentVertices (sa,mab,sb) = Data.Set.toList (Data.Set.difference sb (Data.Set.fromList (Prelude.map snd (Data.Map.toList mab))))
 
+--independentVertices (Data.Set.fromList [1], Data.Map.fromList [(1,"x")], Data.Set.fromList ["x", "y"])
 
+independentVertexMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Map a1 b1 -> [[(a0,b0)]]
+independentVertexMaps (sa1, ma, sa0) (sb1, mb, sb0) loopMap =  setOfFns (independentVertices (sa1,ma,sa0)) (Data.Set.toList sb0)
 
---foldl
+--loopMapChildren :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Map a1 b1 -> [([(a1,b1)],[(a0,b0)])]
+--loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) loopMap = where im = setOfFns (independentVertices (sa1,ma,sa0)) (Data.Set.toList sb0)
+
+-- Map \v -> (loopMap, inducedmap ++ v) im
+
+loopMapChildren :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Map a1 b1 -> [(Map a1 b1, Map a0 b0)]
+-- lists the arrows from (Obj a1 a0) to (Obj b1 b0) which map loops like loopMap does 
+loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) loopMap = Prelude.map (\v -> (loopMap,Data.Map.union (Data.Map.fromList (Prelude.map (\v -> ((ma ! v), (mb ! (loopMap ! v)))) (Data.Set.toList sa1))) (Data.Map.fromList v))) im where im = setOfFns (independentVertices (sa1,ma,sa0)) (Data.Set.toList sb0)
+--vertexMapInducedByLoopMap = Data.Map.fromList (Prelude.map (v -> ((ma ! v), (mb ! (loopMap ! v)))) (Data.Set.toList sa1))
+ -- send loop to (loop's_vertex, loop's_image_vertex)
+-- output type of loopMapChildren is [(Map a1 b1, Map a0 b0)]
+
+allArrows :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a1 b1, Map a0 b0)]
+allArrows (sa1, ma, sa0) (sb1, mb, sb0) = concat (Prelude.map (\v -> loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) v) (Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa1) (Data.Set.toList sb1))))
 
