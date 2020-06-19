@@ -91,37 +91,43 @@ loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) loopMap = Prelude.map (\v -> (loop
 -- output type of loopMapChildren is [(Map a1 b1, Map a0 b0)]
 
 allArrows :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a1 b1, Map a0 b0)]
+-- pair each loop with their child-maps joined to their independent vertex parts, result is a list of all a -> b
 allArrows (sa1, ma, sa0) (sb1, mb, sb0) = concat (Prelude.map (\v -> loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) v) (Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa1) (Data.Set.toList sb1))))
 
 allVertexMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [Map a0 b0]
 allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0) = Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa0) (Data.Set.toList sb0))
 
--- presumably map and set automatically order
+-- presumably map and set automatically order, so action works properley in the exponential object
 
 exponentialObject :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Obj (Map a1 b1, Map a0 b0) (Map a0 b0)
+-- loops~arrows, vertices~VertexMaps, action sends arrow to its vertex-component
 exponentialObject (sa1, ma, sa0) (sb1, mb, sb0) = (Data.Set.fromList arl, Data.Map.fromList (Prelude.map (\v -> (v,snd v)) arl), Data.Set.fromList (allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0))) where arl = allArrows (sa1, ma, sa0) (sb1, mb, sb0)
 
 -- component of evaluation arrow on loops
 evaluationArrowL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => (a1, (Map a1 b1, Map a0 b0)) -> b1
+-- sends (a-loop, arrow) to the result of doing the arrow on the loop
 evaluationArrowL (a1, (m1, m0)) = (m1 !) a1
 
 -- component of evaluation arrow on vertices
---evaluationArrowV :: Ord a0 => Ord b1 => Ord b0 => (a0, Map a0 b0) -> b0
---evaluationArrowV (a0, m0) = (m0 !) a0
-
---evaluationArrowV :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => (a0, Map a0 b0) -> b0
---evaluationArrowV (a0, m0) = (m0 !) a0
-
 evaluationArrowV :: Ord a0 => Ord b0 => (a0, Map a0 b0) -> b0
+-- sends (a-vertex, vertex-map) to the result of doing the vertex-map on the vertex
 evaluationArrowV (a0, m0) = (m0 !) a0
 
 
 transposeL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> c1 -> (Map a1 b1, Map a0 b0)
+-- given arrow (fL, fV) from c * a to b, transposeL sends a loop c1 of c, to the (a -> b) arrow fL(c1,_) which sends loop a1 of a to fL(c1,a1), and which sends vertex a0 of a to fV(vertex c1,a0)  
 transposeL (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c1 = (Data.Map.fromList (Prelude.map (\v -> (v, (fL !) (c1, v))) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v, (fV !) (((mc !) c1), v))) (Data.Set.toList sa0)) )
 
 transposeV :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> c0 -> Map a0 b0
+-- given arrow (fL, fV) from c * a to b, transposeV sends a vertex c0 of c, to the vertex map fV(c0,_) which sends vertex a0 of a to fV(c0,a0)  
 transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c0 = Data.Map.fromList (Prelude.map (\v -> (v,(fV !) (c0, v))) (Data.Set.toList sa0)) 
 
+-- to do: projections, intermediary, subobject classifier, arrow test, object test
+-- MBL
+-- check that enumerating arrows into omega gives correct results
+-- tests
+-- limits + colimits
+-- visualization    
 
 
 
