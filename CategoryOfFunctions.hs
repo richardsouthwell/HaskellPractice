@@ -101,3 +101,21 @@ allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0) = Prelude.map Data.Map.fromList (set
 exponentialObject :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Obj (Map a1 b1, Map a0 b0) (Map a0 b0)
 exponentialObject (sa1, ma, sa0) (sb1, mb, sb0) = (Data.Set.fromList arl, Data.Map.fromList (Prelude.map (\v -> (v,snd v)) arl), Data.Set.fromList (allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0))) where arl = allArrows (sa1, ma, sa0) (sb1, mb, sb0)
 
+-- component of evaluation arrow on loops
+evaluationArrowL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => (a1, (Map a1 b1, Map a0 b0)) -> b1
+evaluationArrowL (a1, (m1, m0)) = (m1 !) a1
+
+-- component of evaluation arrow on vertices
+--evaluationArrowV :: Ord a0 => Ord b1 => Ord b0 => (a0, Map a0 b0) -> b0
+--evaluationArrowV (a0, m0) = (m0 !) a0
+
+transposeL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> c1 -> (Map a1 b1, Map a0 b0)
+transposeL (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c1 = (Data.Map.fromList (Prelude.map (\v -> (v, (fL !) (c1, v))) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v, (fV !) (((mc !) c1), v))) (Data.Set.toList sa0)) )
+
+transposeV :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> c0 -> Map a0 b0
+transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c0 = Data.Map.fromList (Prelude.map (\v -> (v,(fV !) (c0, v))) (Data.Set.toList sa0)) 
+
+
+
+
+
