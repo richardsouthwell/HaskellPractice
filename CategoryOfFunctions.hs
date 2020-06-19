@@ -34,9 +34,41 @@ xx = Data.Map.fromList [(1, Data.Map.fromList [(2,"dog"), (3,"cat")])]
 -- code to enumerate all such maps
 -- add projection maps, intermediate arrows, object validity checker, and arrow validaty checker
 
-
-
-
-
-
 -- can make is member setup, so we can properly talk about power sets
+
+appendWays :: [(a,b)] -> a -> [b] -> [[(a,b)]]
+-- list all the was to extend pv by appending (av,x) where x is in list bs
+appendWays pv av bs = Prelude.map (\v -> pv ++ [(av,v)]) bs
+
+-- appendWays [(1,"x"),(2,"y")] 3 ["x","y","z"]
+
+-- [(*) 2 q | q <- [1..3]]
+
+extend :: [[(a,b)]] -> a -> [b] -> [[(a,b)]]
+-- loop at each list of pairs, replace it with the list of lists of pairs we can get by gluing (av,x):x in bs 
+-- to the end, and then flatten the result
+extend llp av bs = concat (Prelude.map (\f -> appendWays f av bs) llp)
+
+-- extend (appendWays [(1,"x"),(2,"y")] 3 ["x","y","z"]) 4 ["x","y","z"]
+
+-- next just fold over a's
+
+setOfFnsIt :: [[(a,b)]] -> [a] -> [b] -> [[(a,b)]]
+
+setOfFnsIt llp [] bs = llp
+-- folds, extending over every a
+setOfFnsIt llp (av:as) bs = setOfFnsIt (extend llp av bs) as bs
+
+myStart = extend [[]] 1 ["x","y"]
+myTest = setOfFnsIt myStart [2] ["x", "y"]
+
+setOfFns :: [a] -> [b] -> [[(a,b)]]
+setOfFns as bs = setOfFnsIt [[]] as bs
+
+-- setOfFns [1,2] ["x","y"]
+
+
+
+
+--foldl
+
