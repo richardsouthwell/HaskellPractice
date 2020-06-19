@@ -14,6 +14,15 @@ t3 (x,y,z) = z
 
 ex2 = ((t2 ex1) !) "b"
 
+----------------------------------------
+
+functionsToMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> (a1 -> b1) -> (a0 -> b0) -> (Map a1 b1, Map a0 b0)
+functionsToMaps (sa1, ma, sa0) fL fV = (Data.Map.fromList (Prelude.map (\v -> (v, fL v)) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v, fV v)) (Data.Set.toList sa0)))
+
+
+
+-------------------------------------- products
+
 myProduct :: Ord a => Ord b => Ord c => Ord d => Obj a b -> Obj c d -> Obj (a,c) (b,d)
 myProduct (a,f,b) (c,g,d) = (aTimesc, Data.Map.fromList (Prelude.map (\v -> (v, ((f !) (fst v),(g !) (snd v)))) (Data.Set.toList aTimesc)), Data.Set.cartesianProduct b d) where aTimesc = Data.Set.cartesianProduct a c
 
@@ -36,6 +45,9 @@ xx = Data.Map.fromList [(1, Data.Map.fromList [(2,"dog"), (3,"cat")])]
 -- add projection maps, intermediate arrows, object validity checker, and arrow validaty checker
 
 -- can make is member setup, so we can properly talk about power sets
+
+
+---------------------------------------------- exponentials --------------------
 
 appendWays :: [(a,b)] -> a -> [b] -> [[(a,b)]]
 -- list all the was to extend pv by appending (av,x) where x is in list bs
@@ -109,10 +121,42 @@ evaluationArrowL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => (a1, (Map a1 b1, Map
 -- sends (a-loop, arrow) to the result of doing the arrow on the loop
 evaluationArrowL (a1, (m1, m0)) = (m1 !) a1
 
+evaluationArrowLL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => ((Map a1 b1, Map a0 b0), a1) -> b1
+-- sends (a-loop, arrow) to the result of doing the arrow on the loop
+evaluationArrowLL ((m1, m0), a1) = (m1 !) a1
+
+
 -- component of evaluation arrow on vertices
 evaluationArrowV :: Ord a0 => Ord b0 => (a0, Map a0 b0) -> b0
 -- sends (a-vertex, vertex-map) to the result of doing the vertex-map on the vertex
 evaluationArrowV (a0, m0) = (m0 !) a0
+
+-- component of evaluation arrow on vertices
+evaluationArrowVV :: Ord a0 => Ord b0 => (Map a0 b0, a0) -> b0
+-- sends (a-vertex, vertex-map) to the result of doing the vertex-map on the vertex
+evaluationArrowVV (m0, a0) = (m0 !) a0
+
+evaluationArrow :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> (Map ((Map a1 b1, Map a0 b0), a1) b1, Map ((Map a0 b0), a0) b0)
+evaluationArrow (sa1, ma, sa0) (sb1, mb, sb0) = functionsToMaps (myProduct (exponentialObject (sa1, ma, sa0) (sb1, mb, sb0)) (sa1, ma, sa0)) evaluationArrowLL evaluationArrowVV
+--
+
+--evaluationArrow :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> (Map (a1, (Map a1 b1, Map a0 b0)) b1, Map (a0, (Map a0 b0)) b0)
+--evaluationArrow (sa1, ma, sa0) (sb1, mb, sb0) = functionsToMaps (myProduct (exponentialObject (sa1, ma, sa0) (sb1, mb, sb0)) (sa1, ma, sa0)) evaluationArrowL evaluationArrowV
+
+
+--evaluationArrow :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> (Map (a1, (Map a1 b1, Map a0 b0)) b1, Map (a0, (Map a0 b0)) b0)
+--evaluationArrow (sa1, ma, sa0) (sb1, mb, sb0) = (Data.Map.fromList (Prelude.map (\v -> (v, evaluationArrowL v)) (Data.Set.toList (t1 res))), Data.Map.fromList (Prelude.map (\v -> (v, evaluationArrowV v)) (Data.Set.toList (t3 res)))) where res = myProduct (exponentialObject (sa1, ma, sa0) (sb1, mb, sb0)) (sa1, ma, sa0) 
+
+
+--getEvaluationArrow :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj (a1, (Map a1 b1, Map a0 b0)) (a0, (Map a0 b0)) -> (Map (a1, (Map a1 b1, Map a0 b0)) b1, Map (a0, (Map a0 b0)) b0)
+--getEvaluationArrow xx ff yy =  (Prelude.map (\v -> (v, evaluationArrowL v)) (Data.Set.toList xx), Prelude.map (\v -> (v, evaluationArrowV v)) (Data.Set.toList yy))
+-- do getEvaluationArrow (myProduct (exponentialObject (sa1, ma, sa0) (sb1, mb, sb0)) (sa1, ma, sa0))
+
+--Map (a1, (Map a1 b1, Map a0 b0)) b1
+--(\v -> (fst v, ) )
+--getEvaluationArrow :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj (Map a1 b1, Map a0 b0) (Map a0 b0) -> (Map (a1, (Map a1 b1, Map a0 b0)) b1, Map (a0, (Map a0 b0)) b0)
+--getEvaluationArrow (sa1, ma, sa0) (sm1, mm, sm0) = 
+-- (a1, (m1, m0)) = (m1 !) a1
 
 
 transposeL :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> c1 -> (Map a1 b1, Map a0 b0)
@@ -125,7 +169,14 @@ transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c0 = Data.Map.fromList (Prelud
 
 -- make code to change a function specification to a map and apply it to write eval and transpose as maps
 
+--functionsToMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> (a1 -> b1) -> (a0 -> b0) -> (Map a1 b1, Map a0 b0)
+
+
+
+
 -- make internalization of composition
+
+-- make arrow composition operator
 
 -- to do: projections, intermediary, subobject classifier, arrow test, object test
 -- MBL
@@ -136,4 +187,53 @@ transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c0 = Data.Map.fromList (Prelud
 
 
 
+kk= exponentialObject ex1 ex1 
+
+-- :t t1 (myProduct kk ex1)
+
+-- open up an example, and get eval map properley
+
+e1 = (Data.Set.fromList ['a', 'b'], Data.Map.fromList [('a',1),('b',2)], Data.Set.fromList [1, 2])
+e2 = (Data.Set.fromList [True, False], Data.Map.fromList [(True, 0.1),(False, 0.2)], Data.Set.fromList [ 0.1, 0.2])
+
+myExp = exponentialObject e1 e2
+
+myObj = myProduct myExp e1
+
+myObjLoops = Data.Set.toList (t1 myObj)
+
+--getLoops :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [((Map a1 b1, Map a0 b0), a0)]
+--getLoops (e1A, e1B, e1C) (e2A, e2B, e2C) = Data.Set.toList (t1 (myProduct (exponentialObject (e1A, e1B, e1C) (e2A, e2B, e2C)) (e1A, e1B, e1C)))
+
+--(e1A, e1B, e1C) (e2A, e2B, e2C)
+
+exponentialObject2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Obj (Map a1 b1, Map a0 b0) (Map a0 b0)
+exponentialObject2 (sa1, ma, sa0) (sb1, mb, sb0) = exponentialObject (sa1, ma, sa0) (sb1, mb, sb0)
+
+myObj2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Obj ((Map a1 b1, Map a0 b0), a1) (Map a0 b0, a0)
+myObj2 (sa1, ma, sa0) (sb1, mb, sb0) = myProduct theExp (sa1, ma, sa0) where theExp = (exponentialObject2 (sa1, ma, sa0) (sb1, mb, sb0))
+
+myVertices2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a0 b0, a0)]
+myVertices2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Set.toList (t3 dataa) where dataa = myObj2 (sa1, ma, sa0) (sb1, mb, sb0)
+
+--evaluationArrowV :: Ord a0 => Ord b0 => (a0, Map a0 b0) -> b0
+-----------------------
+--myVertexMap2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Map (Map a0 b0, a0) b0
+--myVertexMap2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Map.fromList (Prelude.map )
+--Obj ((Map a1 b1, Map a0 b0), a1) (Map a0 b0, a0)
+ 
+
+--myObj3 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> (Set ((Map a1 b1, Map a0 b0), a1), Map ((Map a1 b1, Map a0 b0), a1) (Map a0 b0, a0), Set (Map a0 b0, a0))
+--myObj3 (sa1, ma, sa0) (sb1, mb, sb0) = myProduct theExp (sa1, ma, sa0) where theExp = (exponentialObject2 (sa1, ma, sa0) (sb1, mb, sb0))
+
+--myVertices2b :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Set (Map a0 b0, a0)
+--myVertices2b (sa1, ma, sa0) (sb1, mb, sb0) = u3 where (u1, u2, u3) = myObj3 (sa1, ma, sa0) (sb1, mb, sb0)
+
+
+--myVertices2b :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Set (Map a0 b0, a0)
+--myVertices2b (sa1, ma, sa0) (sb1, mb, sb0) = (t1 dataa) where dataa = myObj3 (sa1, ma, sa0) (sb1, mb, sb0)
+
+
+--myVertices2 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a0 b0, a0)]
+--myVertices2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Set.toList (t1 dataa) where dataa = myObj2 (sa1, ma, sa0) (sb1, mb, sb0)
 
