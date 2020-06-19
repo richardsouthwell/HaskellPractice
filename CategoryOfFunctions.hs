@@ -17,10 +17,11 @@ ex2 = ((t2 ex1) !) "b"
 myProduct :: Ord a => Ord b => Ord c => Ord d => Obj a b -> Obj c d -> Obj (a,c) (b,d)
 myProduct (a,f,b) (c,g,d) = (aTimesc, Data.Map.fromList (Prelude.map (\v -> (v, ((f !) (fst v),(g !) (snd v)))) (Data.Set.toList aTimesc)), Data.Set.cartesianProduct b d) where aTimesc = Data.Set.cartesianProduct a c
 
+-- p1L == p1V == fst 
+-- p2L == p2V == snd
 
---(snd v)
-
-
+intermed :: Ord z1 => Ord z0 => Ord a1 => Ord a0 => Ord b1 => Ord b0 => (Map z1 a1, Map z0 a0) -> (Map z1 b1, Map z0 b0) -> (Map z1 (a1, b1), Map z0 (a0,b0))
+intermed (fL, fV) (gL, gV) = (Data.Map.fromList (Prelude.map (\v -> ((fst v), ((fL !) (fst v), (gL !) (fst v))))  (Data.Map.toList fL)), Data.Map.fromList (Prelude.map (\v -> ((fst v), ((fV !) (fst v), (gV !) (fst v))))  (Data.Map.toList fV))) 
 
 --myProduct (a,f,b) (c,g,d) = (((aTimesc, Data.Map.fromList lis, Data.Set.cartesianProduct b d) where lis = Prelude.map ( mymap) (Data.Set.toList aTimesc)) where mymap = (  \v -> (v, ((f !) v,(g !) v))) ) where aTimesc = Data.Set.cartesianProduct a c
 
@@ -121,6 +122,10 @@ transposeL (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c1 = (Data.Map.fromList (Prelu
 transposeV :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => Obj a1 a0 -> Obj c1 c0 -> (Map (c1,a1) b1, Map (c0,a0) b0) -> c0 -> Map a0 b0
 -- given arrow (fL, fV) from c * a to b, transposeV sends a vertex c0 of c, to the vertex map fV(c0,_) which sends vertex a0 of a to fV(c0,a0)  
 transposeV (sa1, ma, sa0) (sc1, mc, sc0) (fL, fV) c0 = Data.Map.fromList (Prelude.map (\v -> (v,(fV !) (c0, v))) (Data.Set.toList sa0)) 
+
+-- make code to change a function specification to a map and apply it to write eval and transpose as maps
+
+-- make internalization of composition
 
 -- to do: projections, intermediary, subobject classifier, arrow test, object test
 -- MBL
