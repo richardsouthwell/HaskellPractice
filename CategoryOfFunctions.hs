@@ -274,4 +274,8 @@ inclusion (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.S
 terminalObject :: Obj String String
 terminalObject = (Data.Set.fromList ["t"], Data.Map.fromList [("t","tv")], Data.Set.fromList ["tv"])
 
---omega :: Obj String String
+omega :: Obj String String
+omega = (Data.Set.fromList ["t", "m", "f"], Data.Map.fromList [("t","tv"), ("m","tv"), ("f","fv")], Data.Set.fromList ["tv", "fv"])
+
+trueArrow :: (Map String String, Map String String)
+trueArrow = inclusion terminalObject
