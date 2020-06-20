@@ -86,7 +86,7 @@ myTest = setOfFnsIt myStart [2] ["x", "y"]
 
 setOfFns :: [a] -> [b] -> [[(a,b)]]
 setOfFns as bs = setOfFnsIt [[]] as bs
-
+-- returns a list of all the functions from [a] to [b] (with everything represented by lists)
 -- test the above vs `tuples' code + fold based code
 
 
@@ -251,22 +251,20 @@ myVertices2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Set.toList (t3 dataa) where dat
 
 
 -----------------------------------
--- working
--- composition of Maps
--- terminal object
--- Subobject classifier
--- chi, and "subobject classified by arrow"
--- identity arrows
-
 -- comp works as "after", for arrow composition
 comp :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => (Map b1 c1, Map b0 c0) -> (Map a1 b1, Map a0 b0) -> (Map a1 c1, Map a0 c0)
+-- takes in two arrows and returns their composition
 comp (g1, g0) (f1, f0) = (Data.Map.map (g1 !) f1, Data.Map.map (g0 !) f0)
+
+
 
 --map3 = Data.Map.fromList [("a",2), ("b",3)]
 --map4 = Data.Map.fromList [(2,3), (3,7)]
 --map5 = Data.Map.map (map4 !) map3
 
 inclusion :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 a1, Map a0 a0)
+-- arrow that sends all vertices and loops to self
+-- whether this is an identity map or some other inclusion depends on the target object, which is unspecified here
 inclusion (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.Set.toList sa0)))
 -- inclusion could describe an identity arrow, or an inclusion map depending on the context
 
@@ -275,6 +273,7 @@ terminalObject :: Obj String String
 terminalObject = (Data.Set.fromList ["t"], Data.Map.fromList [("t","tv")], Data.Set.fromList ["tv"])
 
 arrowToTerminal :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 String, Map a0 String)
+-- returns the arrow from an objec to the terminal object
 arrowToTerminal (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,"t")) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v,"tv")) (Data.Set.toList sa0)))
 
 
@@ -286,22 +285,25 @@ actionArrow :: (Map String String, Map String String)
 actionArrow = inclusion singleVertex
 
 omega :: Obj String String
+-- subobject classifier
 omega = (Data.Set.fromList ["t", "m", "f"], Data.Map.fromList [("t","tv"), ("m","tv"), ("f","fv")], Data.Set.fromList ["tv", "fv"])
 
 trueArrow :: (Map String String, Map String String)
+-- true arrow as inclusion
 trueArrow = inclusion terminalObject
 
 subobjectClassifiedBy :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 String, Map a0 String) -> Obj a1 a0
+-- input: object + arrow from object to chi
 -- outputs a substructure of Obj a1 a0, which we imagine is equipped with an inclusion map
 -- here (chi1, chi0) is an arrow from Obj a1 a0  to omega
 subobjectClassifiedBy (sa1, ma, sa0) (chi1, chi0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (ma !) v)) remainingLoops), Data.Set.fromList (Prelude.map fst (Prelude.filter (\v -> ((snd v) == "tv")) (Data.Map.toList chi0))) ) where remainingLoops = Prelude.map fst (Prelude.filter (\v -> ((snd v) == "t")) (Data.Map.toList chi1))
 
 -- assuming monic is inclusion map
 -- (we can add monic test, and convert any monic to its equivalent inclusion map
--- just by using `convert to inclusion')
-classifyingArrowOf :: Ord a1 => Ord a0 => Obj a1 a0 -> Obj a1 a0 -> (Map a1 String, Map a0 String)
-classifyingArrowOf (sa1, ma, sa0) (usa1, uma, usa0) = (Data.Map.fromList (Prelude.map (\v -> (v, if (Data.Set.member v usa1) then "t" else (if (Data.Set.member ((ma !) v) usa0) then "m" else "f" ))) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v, if (Data.Set.member v usa0) then "tv" else "fv")) (Data.Set.toList sa0)))
-
+-- just by using `convertToInclusion')
+classifyingArrowOfInclusion :: Ord a1 => Ord a0 => Obj a1 a0 -> Obj a1 a0 -> (Map a1 String, Map a0 String)
+classifyingArrowOfInclusion (sa1, ma, sa0) (usa1, uma, usa0) = (Data.Map.fromList (Prelude.map (\v -> (v, if (Data.Set.member v usa1) then "t" else (if (Data.Set.member ((ma !) v) usa0) then "m" else "f" ))) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v, if (Data.Set.member v usa0) then "tv" else "fv")) (Data.Set.toList sa0)))
+-- input: object + substructure, output: arrow to chi
 
 
 
@@ -315,10 +317,16 @@ classifyingArrowOf (sa1, ma, sa0) (usa1, uma, usa0) = (Data.Map.fromList (Prelud
 
 -- equivalent inclusion map to monic
 -- here we just return the substructure, but when its equipped with its inclusion, job is done
-convertToInclusion :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj b1 b0 -> (Map a1 b1, Map a0 b0) -> Obj b1 b0 
-convertToInclusion (sb1, mb, sb0) (i1, i0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (mb !) v)) remainingLoops), Data.Set.fromList (Prelude.map snd (Data.Map.toList i0))) where remainingLoops = Prelude.map snd (Data.Map.toList i1)
+convertToInclusion :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => (Map a1 b1, Map a0 b0) -> Obj b1 b0  -> Obj b1 b0 
+convertToInclusion (i1, i0) (sb1, mb, sb0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (mb !) v)) remainingLoops), Data.Set.fromList (Prelude.map snd (Data.Map.toList i0))) where remainingLoops = Prelude.map snd (Data.Map.toList i1)
+-- input: monic + target object of monic, output: substructure of target object
+
 --convertToInclusion :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> (Map a1 b1, Map a0 b0) -> Obj a1 a0 
 --convertToInclusion (sa1, ma, sa0) (i1, i0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (ma !) v)) remainingLoops), Data.Set.fromList (Prelude.map snd (Data.Map.toList i0))) where remainingLoops = Prelude.map snd (Data.Map.toList i1)
+
+classifyingArrowOf :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => (Map a1 b1, Map a0 b0) -> Obj b1 b0 -> (Map b1 String, Map b0 String)
+classifyingArrowOf (i1, i0) (sb1, mb, sb0) = classifyingArrowOfInclusion (sb1, mb, sb0) (convertToInclusion (i1, i0) (sb1, mb, sb0))
+-- input: monic + target object of monic, output: classifying arrow of monic
 
 
 -- initialObjects
