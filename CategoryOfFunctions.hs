@@ -274,8 +274,28 @@ inclusion (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.S
 terminalObject :: Obj String String
 terminalObject = (Data.Set.fromList ["t"], Data.Map.fromList [("t","tv")], Data.Set.fromList ["tv"])
 
+arrowToTerminal :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 String, Map a0 String)
+arrowToTerminal (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,"t")) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v,"tv")) (Data.Set.toList sa0)))
+
+
+singleVertex :: Obj String String
+singleVertex = (Data.Set.fromList [], Data.Map.fromList [], Data.Set.fromList ["tv"])
+
+-- action arrow is s_{->} goes from single vertex to terminal object
+actionArrow :: (Map String String, Map String String)
+actionArrow = inclusion singleVertex
+
 omega :: Obj String String
 omega = (Data.Set.fromList ["t", "m", "f"], Data.Map.fromList [("t","tv"), ("m","tv"), ("f","fv")], Data.Set.fromList ["tv", "fv"])
 
 trueArrow :: (Map String String, Map String String)
 trueArrow = inclusion terminalObject
+
+subobjectClassifiedBy :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 String, Map a0 String) -> Obj a1 a0
+-- outputs a substructure of Obj a1 a0, which we imagine is equipped with an inclusion map
+-- here (chi1, chi0) is an arrow from Obj a1 a0  to omega
+subobjectClassifiedBy (sa1, ma, sa0) (chi1, chi0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (ma !) v)) remainingLoops), Data.Set.fromList (Prelude.map fst (Prelude.filter (\v -> ((snd v) == "tv")) (Data.Map.toList chi0))) ) where remainingLoops = Prelude.map fst (Prelude.filter (\v -> ((snd v) == "t")) (Data.Map.toList chi1))
+
+
+
+-- initialObjects
