@@ -251,17 +251,27 @@ myVertices2 (sa1, ma, sa0) (sb1, mb, sb0) = Data.Set.toList (t3 dataa) where dat
 
 
 -----------------------------------
-
+-- working
 -- composition of Maps
 -- terminal object
 -- Subobject classifier
 -- chi, and "subobject classified by arrow"
 -- identity arrows
 
--- carr works as "after", for arrow composition
-carr :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => (Map b1 c1, Map b0 c0) -> (Map a1 b1, Map a0 b0) -> (Map a1 c1, Map a0 c0)
-carr (g1, g0) (f1, f0) = (Data.Map.map (g1 !) f1, Data.Map.map (g0 !) f0)
+-- comp works as "after", for arrow composition
+comp :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Ord c1 => Ord c0 => (Map b1 c1, Map b0 c0) -> (Map a1 b1, Map a0 b0) -> (Map a1 c1, Map a0 c0)
+comp (g1, g0) (f1, f0) = (Data.Map.map (g1 !) f1, Data.Map.map (g0 !) f0)
 
 --map3 = Data.Map.fromList [("a",2), ("b",3)]
 --map4 = Data.Map.fromList [(2,3), (3,7)]
 --map5 = Data.Map.map (map4 !) map3
+
+inclusion :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 a1, Map a0 a0)
+inclusion (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.Set.toList sa0)))
+-- inclusion could describe an identity arrow, or an inclusion map depending on the context
+
+
+terminalObject :: Obj String String
+terminalObject = (Data.Set.fromList ["t"], Data.Map.fromList [("t","tv")], Data.Set.fromList ["tv"])
+
+--omega :: Obj String String
