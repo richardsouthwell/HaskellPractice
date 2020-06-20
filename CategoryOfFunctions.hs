@@ -296,6 +296,29 @@ subobjectClassifiedBy :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 String, Map a0
 -- here (chi1, chi0) is an arrow from Obj a1 a0  to omega
 subobjectClassifiedBy (sa1, ma, sa0) (chi1, chi0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (ma !) v)) remainingLoops), Data.Set.fromList (Prelude.map fst (Prelude.filter (\v -> ((snd v) == "tv")) (Data.Map.toList chi0))) ) where remainingLoops = Prelude.map fst (Prelude.filter (\v -> ((snd v) == "t")) (Data.Map.toList chi1))
 
+-- assuming monic is inclusion map
+-- (we can add monic test, and convert any monic to its equivalent inclusion map
+-- just by using `convert to inclusion')
+classifyingArrowOf :: Ord a1 => Ord a0 => Obj a1 a0 -> Obj a1 a0 -> (Map a1 String, Map a0 String)
+classifyingArrowOf (sa1, ma, sa0) (usa1, uma, usa0) = (Data.Map.fromList (Prelude.map (\v -> (v, if (Data.Set.member v usa1) then "t" else (if (Data.Set.member ((ma !) v) usa0) then "m" else "f" ))) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v, if (Data.Set.member v usa0) then "tv" else "fv")) (Data.Set.toList sa0)))
+
+
+
+
+
+
+
+
+
+--member :: Ord a => a -> Set a -> Bool
+
+
+-- equivalent inclusion map to monic
+-- here we just return the substructure, but when its equipped with its inclusion, job is done
+convertToInclusion :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj b1 b0 -> (Map a1 b1, Map a0 b0) -> Obj b1 b0 
+convertToInclusion (sb1, mb, sb0) (i1, i0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (mb !) v)) remainingLoops), Data.Set.fromList (Prelude.map snd (Data.Map.toList i0))) where remainingLoops = Prelude.map snd (Data.Map.toList i1)
+--convertToInclusion :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> (Map a1 b1, Map a0 b0) -> Obj a1 a0 
+--convertToInclusion (sa1, ma, sa0) (i1, i0) = (Data.Set.fromList remainingLoops, Data.Map.fromList (Prelude.map (\v -> (v, (ma !) v)) remainingLoops), Data.Set.fromList (Prelude.map snd (Data.Map.toList i0))) where remainingLoops = Prelude.map snd (Data.Map.toList i1)
 
 
 -- initialObjects
