@@ -330,3 +330,4 @@ classifyingArrowOf (i1, i0) (sb1, mb, sb0) = classifyingArrowOfInclusion (sb1, m
 
 
 -- initialObjects
+-- diag
