@@ -331,3 +331,12 @@ classifyingArrowOf (i1, i0) (sb1, mb, sb0) = classifyingArrowOfInclusion (sb1, m
 
 -- initialObjects
 -- diag
+
+diagonal :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 (a1, a1), Map a0 (a0, a0))
+diagonal (sa1, ma, sa0) = intermed id id where id = inclusion (sa1, ma, sa0)
+
+--intermed :: Ord z1 => Ord z0 => Ord a1 => Ord a0 => Ord b1 => Ord b0 => (Map z1 a1, Map z0 a0) -> (Map z1 b1, Map z0 b0) -> (Map z1 (a1, b1), Map z0 (a0,b0))
+
+
+--inclusion :: Ord a1 => Ord a0 => Obj a1 a0 -> (Map a1 a1, Map a0 a0)
+--inclusion (sa1, ma, sa0) = (Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.Set.toList sa1)), Data.Map.fromList (Prelude.map (\v -> (v,v)) (Data.Set.toList sa0)))
