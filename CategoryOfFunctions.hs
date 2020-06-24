@@ -341,4 +341,9 @@ equalizer :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> (
 -- inputs are A,B, f and g, output is the substructure of A corresponding to the equalizer
 equalizer (sa1, ma, sa0) (sb1, mb, sb0) f g = subobjectClassifiedBy (sa1, ma, sa0) (comp (classifyingArrowOf  (diagonal (sb1, mb, sb0)) (myProduct (sb1, mb, sb0) (sb1, mb, sb0))) (intermed f g))
 
+objectExample = (Data.Set.fromList ["a","b"], Data.Map.fromList [("a",1),("b",1)], Data.Set.fromList [1,2])
+
+myEx8 = equalizer objectExample objectExample (inclusion objectExample) (Data.Map.fromList [("a","b"),("b","b")], Data.Map.fromList [(1,1),(2,2)])
+
+
 
