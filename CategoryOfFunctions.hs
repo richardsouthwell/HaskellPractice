@@ -112,9 +112,22 @@ loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) loopMap = Prelude.map (\v -> (loop
  -- send loop to (loop's_vertex, loop's_image_vertex)
 -- output type of loopMapChildren is [(Map a1 b1, Map a0 b0)]
 
-allArrows :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a1 b1, Map a0 b0)]
+allArrows0 :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a1 b1, Map a0 b0)]
 -- pair each loop with their child-maps joined to their independent vertex parts, result is a list of all a -> b
-allArrows (sa1, ma, sa0) (sb1, mb, sb0) = concat (Prelude.map (\v -> loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) v) (Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa1) (Data.Set.toList sb1))))
+allArrows0 (sa1, ma, sa0) (sb1, mb, sb0) = concat (Prelude.map (\v -> loopMapChildren (sa1, ma, sa0) (sb1, mb, sb0) v) (Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa1) (Data.Set.toList sb1))))
+
+-- added filter to only select "arrows" which correspond to proper maps as loops of the exponetial object
+
+-- a faster algorithm would be to enumerate over the different "local loop to loop maps + [independent vertex maps]" - children of each maps from vertices with loops to vertices with loops
+
+goodArrowQ :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> (Map a1 b1, Map a0 b0) -> Bool
+goodArrowQ (sa1, ma, sa0) (sb1, mb, sb0) (f1, f0) = ([] == (Prelude.filter (\v -> ((f0 ! ((ma !) v)) /= (mb ! ((f1 !) v)))) (Data.Set.toList sa1)))
+
+
+
+allArrows :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [(Map a1 b1, Map a0 b0)]
+allArrows (sa1, ma, sa0) (sb1, mb, sb0) = (Prelude.filter (\v -> (goodArrowQ (sa1, ma, sa0) (sb1, mb, sb0) v)) allAr) where allAr = allArrows0 (sa1, ma, sa0) (sb1, mb, sb0)  
+
 
 allVertexMaps :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> [Map a0 b0]
 allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0) = Prelude.map Data.Map.fromList (setOfFns (Data.Set.toList sa0) (Data.Set.toList sb0))
