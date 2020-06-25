@@ -345,5 +345,5 @@ objectExample = (Data.Set.fromList ["a","b"], Data.Map.fromList [("a",1),("b",1)
 
 myEx8 = equalizer objectExample objectExample (inclusion objectExample) (Data.Map.fromList [("a","b"),("b","b")], Data.Map.fromList [(1,1),(2,2)])
 
-
+andArrow = classifyingArrowOf (intermed trueArrow trueArrow) (myProduct omega omega)
 
