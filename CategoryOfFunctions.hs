@@ -360,3 +360,21 @@ myEx8 = equalizer objectExample objectExample (inclusion objectExample) (Data.Ma
 
 andArrow = classifyingArrowOf (intermed trueArrow trueArrow) (myProduct omega omega)
 
+-- intersection
+
+-- coproduct
+
+-- union
+
+-- lattice of subobjects
+
+-- if statement
+
+--exponentialObject :: Ord a1 => Ord a0 => Ord b1 => Ord b0 => Obj a1 a0 -> Obj b1 b0 -> Obj (Map a1 b1, Map a0 b0) (Map a0 b0)
+-- loops~arrows, vertices~VertexMaps, action sends arrow to its vertex-component
+--exponentialObject (sa1, ma, sa0) (sb1, mb, sb0) = (Data.Set.fromList arl, Data.Map.fromList (Prelude.map (\v -> (v,snd v)) arl), Data.Set.fromList (allVertexMaps (sa1, ma, sa0) (sb1, mb, sb0))) where arl = allArrows (sa1, ma, sa0) (sb1, mb, sb0)
+
+powerObject :: Ord a1 => Ord a0 =>  Obj a1 a0 ->  Obj (Map a1 String, Map a0 String) (Map a0 String)
+powerObject (sa1, ma, sa0) = exponentialObject (sa1, ma, sa0) omega
+
+myPowerExample = powerObject objectExample
