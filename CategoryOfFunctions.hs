@@ -378,3 +378,8 @@ powerObject :: Ord a1 => Ord a0 =>  Obj a1 a0 ->  Obj (Map a1 String, Map a0 Str
 powerObject (sa1, ma, sa0) = exponentialObject (sa1, ma, sa0) omega
 
 myPowerExample = powerObject objectExample
+
+-- make code to determine the subobject associated with a point
+
+-- make code to determine containment
+
